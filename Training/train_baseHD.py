@@ -91,12 +91,17 @@ def train_single_scale(dataloader, netD, netG, netS, reals, Gs, Ss, in_s, in_s_S
                     RMSE = torch.sqrt(criterion(data['image'], prev))
                     opt.noise_amp = opt.noise_amp_init * RMSE
                     prev_S = draw_concat(Ss, data['down_scale_image'], reals, NoiseAmpS, in_s_S, 'segment', opt)
-                    RMSE_S = torch.sqrt(criterion(mask2onehot(data['label'], opt.label_nc), prev_S))
+                    prev_S = mask2onehot(prev_S, opt.label_nc)
+                    # onehot_label = mask2onehot(data['label'], opt.label_nc)
+                    # print(onehot_label.shape, prev_S.shape)
+                    # RMSE_S = torch.sqrt(criterion(onehot_label, prev_S))
+                    RMSE_S = 0
                     opt.noise_amp_S = opt.noise_amp_init * RMSE_S
                     mask = data['label']
             else:
                 prev = draw_concat(Gs, data['down_scale_label'], reals, NoiseAmp, in_s, 'generator', opt)
                 prev_S = draw_concat(Ss, data['down_scale_image'], reals, NoiseAmpS, in_s_S, 'segment', opt)
+                prev_S = mask2onehot(prev_S, opt.label_nc)
                 mask = data['label']
 
             if Gs == []:
@@ -111,7 +116,10 @@ def train_single_scale(dataloader, netD, netG, netS, reals, Gs, Ss, in_s, in_s_S
             # print(len(pred_fake), len(pred_fake[0]))
             loss_D_fake = loss.criterionGAN(pred_fake, False)
             D_G_z = loss_D_fake.item()
-            segment_logit, segment_mask = netS(data['image'], mask2onehot(prev_S, opt.label_nc))
+            # segment_logit, segment_mask = netS(data['image'], mask2onehot(prev_S, opt.label_nc))
+            # print(data['image'].shape, onehot.shape)
+            # print(epoch, j)
+            segment_logit, segment_mask = netS(data['image'], prev_S)
             pred_fake_S = netD(data['image'], segment_mask.detach())
             # print(len(pred_fake_S), len(pred_fake_S[0]))
             # exit()

@@ -24,12 +24,13 @@ class DenseLayer(nn.Module):
         self.bn = nn.BatchNorm2d(self.n_channels)
         self.conv = nn.Conv2d(self.n_channels, self.growth_rate,
                 kernel_size=3, padding=1, bias=False)
-        self.do = nn.Dropout2d(p=0.2)
+        # self.do = nn.Dropout2d(p=0.2)
 
     def forward(self, x):
         out0 = F.relu(self.bn(x))
         out1 = self.conv(out0)
-        out2 = self.do(out1)
+        out2 = out1
+        # out2 = self.do(out1)
         concat = torch.cat([x, out2], 1)
         return concat
 
@@ -59,18 +60,18 @@ class TransitionDown(nn.Module):
         self.conv = nn.Conv2d(self.n_channels_in, self.n_channels_out,
                             kernel_size=1, padding=0)
         self.pool = nn.MaxPool2d((2,2), stride=2)
-        self.do = nn.Dropout2d(p=0.2)
+        # self.do = nn.Dropout2d(p=0.2)
 
     def forward(self, x):
 
         out0 = F.relu(self.bn(x))
         out1 = self.conv(out0)
-        out2 = self.do(out1)
+        out2=out1
+        # out2 = self.do(out1)
         pooled = self.pool(out2)
         return pooled
 
 class TransitionUp(nn.Module):
-
     def __init__(self, n_channels_in, n_channels_out=None):
         '''
         FC-DenseNet Transition Up module, as described in Jegou 2017.
@@ -104,8 +105,7 @@ class TransitionUp(nn.Module):
         return upsamp
 
 class DenseBlock(nn.Module):
-
-    def __init__(self, n_layers, n_channels, growth_rate=16, keep_input=True):
+    def __init__(self, n_layers, n_channels, growth_rate=12, keep_input=True):
         '''
         Builds a DenseBlock from DenseLayers.
         As described in Jegou 2017.
@@ -141,7 +141,6 @@ class DenseBlock(nn.Module):
         return out
 
     def _build_block(self):
-
         n_channels = self.n_channels
         layers = []
 
@@ -154,13 +153,12 @@ class DenseBlock(nn.Module):
 
         return stack
 
-class DenseNet103(nn.Module):
-
-    def __init__(self, growth_rate=16, n_pool=5, n_classes=4,
+class DenseNet(nn.Module):
+    def __init__(self, growth_rate=12, n_pool=3, n_classes=4,
                 n_channels_in=3,
-                n_channels_first=48,
-                n_layers_down=[4,5,7,10,12],
-                n_layers_up=[12,10,7,5,4],
+                n_channels_first=16,
+                n_layers_down=[4,5,7],
+                n_layers_up=[7,5,4],
                 verbose=False):
         '''
         DenseNet 103 for semantic segmentation,
@@ -181,7 +179,7 @@ class DenseNet103(nn.Module):
         verbose : boolean. print downsampling/upsampling dimensionality.
         '''
 
-        super(DenseNet103, self).__init__()
+        super(DenseNet, self).__init__()
 
         self.growth_rate = growth_rate
         self.n_pool = n_pool
@@ -216,7 +214,7 @@ class DenseNet103(nn.Module):
             skip_channels.append(down_channels)
 
         # Bottleneck
-        self.bottleneck = DenseBlock(n_layers=15,
+        self.bottleneck = DenseBlock(n_layers=10,
                 n_channels=getattr(self,
                             'down_dblock'+str(self.n_pool-1)).n_channels_out,
                 growth_rate=self.growth_rate,
@@ -252,19 +250,16 @@ class DenseNet103(nn.Module):
         :return:
         """
         x = torch.cat((x, segment), dim=1)  ## concatenate image and mask
-
         in_conv = self.conv0(x)
         out = in_conv
         # Downsampling path
         self.dblock_outs = []
         for i in range(self.n_pool):
-
             dblock = getattr(self, 'down_dblock' + str(i))
             td = getattr(self, 'td' + str(i))
 
             db_x = dblock(out)
             self.dblock_outs.append(db_x)
-
             out = td(db_x)
             if self.verbose:
                 print('m: ', out.size(1))
@@ -277,15 +272,14 @@ class DenseNet103(nn.Module):
         # Upsampling path
         out = bneck
         for i in range(self.n_pool):
-
             tu = getattr(self, 'tu' + str(i))
             ublock = getattr(self, 'up_dblock' + str(i))
             skip = self.dblock_outs[-(i+1)]
-
             up = tu(out)
 
             cat = torch.cat([skip, up], 1)
             out = ublock(cat)
+
 
             if self.verbose:
                 print('Skip: ', skip.size())
@@ -300,26 +294,27 @@ class DenseNet103(nn.Module):
             print('Classif: ', classif_logit.size())
         return classif_logit, segment_mask
 
-class Ensemble(object):
-    '''Create an ensemble of models for predictions'''
-    def __init__(self, models):
-        '''
-        models : list. list of model objects with a callable .forward() method.
-        '''
-        self.models = models
-
-    def __call__(self, inputs):
-        '''Return the mean prediction of all models in `models`'''
-        outs = []
-        for m in self.models:
-            outs.append(m(inputs))
-        output = torch.stack(outs)
-        output = output.sum(0)/len(outs)
-        return output
+# class Ensemble(object):
+#     '''Create an ensemble of models for predictions'''
+#     def __init__(self, models):
+#         '''
+#         models : list. list of model objects with a callable .forward() method.
+#         '''
+#         self.models = models
+#
+#     def __call__(self, inputs):
+#         '''Return the mean prediction of all models in `models`'''
+#         outs = []
+#         for m in self.models:
+#             outs.append(m(inputs))
+#         output = torch.stack(outs)
+#         output = output.sum(0)/len(outs)
+#         return output
 
 
 if __name__ == "__main__":
-    image = torch.randn(32, 3, 128,128)
-    DenseNet = DenseNet103()
-    output = DenseNet(image)
+    image = torch.randn(32, 3, 64, 64)
+    segment = torch.randn(32, 4, 64, 64)
+    DenseNet = DenseNet(n_channels_in=7)
+    output = DenseNet(image, segment)
     print(output.shape)
