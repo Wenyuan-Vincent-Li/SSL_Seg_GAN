@@ -67,7 +67,11 @@ def imresize(im,scale,opt):
 def imresize_single(im,scale,opt):
     im = torch2uint8(im)
     im = imresize_in(im, scale_factor=scale)
-    im = np2torch(im, opt)
+    im = im.transpose((2,0,1)) / 255
+    im = torch.from_numpy(im)
+    im = move_to_gpu(im)
+    im = im.type(torch.cuda.FloatTensor)
+    im = norm(im)
     return im
 
 def imresize_to_shape(im,output_shape,opt):

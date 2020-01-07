@@ -96,7 +96,7 @@ def train_single_scale(dataloader, netD, netG, netS, reals, Gs, Ss, in_s, in_s_S
                     mask = data['label']
             else:
                 prev = draw_concat(Gs, data['down_scale_label'], reals, NoiseAmp, in_s, 'generator', opt)
-                prev_S = draw_concat(Ss, data['down_scale_image'], reals, NoiseAmp, in_s_S, 'segment', opt)
+                prev_S = draw_concat(Ss, data['down_scale_image'], reals, NoiseAmpS, in_s_S, 'segment', opt)
                 mask = data['label']
 
             if Gs == []:
@@ -111,8 +111,7 @@ def train_single_scale(dataloader, netD, netG, netS, reals, Gs, Ss, in_s, in_s_S
             # print(len(pred_fake), len(pred_fake[0]))
             loss_D_fake = loss.criterionGAN(pred_fake, False)
             D_G_z = loss_D_fake.item()
-            print(data['image'].shape, prev_S.shape)
-            segment_logit, segment_mask = netS(data['image'], prev_S)
+            segment_logit, segment_mask = netS(data['image'], mask2onehot(prev_S, opt.label_nc))
             pred_fake_S = netD(data['image'], segment_mask.detach())
             # print(len(pred_fake_S), len(pred_fake_S[0]))
             # exit()
@@ -244,7 +243,7 @@ def draw_concat(Gs, masks, reals, NoiseAmp, in_s, mode, opt):
             count = 0
             for G, mask, real_curr, real_next, noise_amp in zip(Gs, masks, reals, reals[1:], NoiseAmp):
                 G_z = G_z[:, :, 0:real_curr[0], 0:real_curr[1]]  ## G_z [None, 3, 32, 32]
-                G_z = G(mask, G_z, mask)  ## [1, 3, 26, 26] output of previous generator
+                _, G_z = G(mask, mask2onehot(G_z, opt.label_nc))  ## [1, 3, 26, 26] output of previous generator
                 G_z = imresize(G_z, real_next[1] / real_curr[1], opt)
                 G_z = G_z[:, :, 0:real_next[0],
                       0:real_next[1]]  ## resize the image to be compatible with current G [1, 3, 33, 33]

@@ -55,8 +55,8 @@ class AlignedDataset(BaseDataset):
             down_scale_image = []
             for i in range(self.opt.scale_num):
                 B_curr = imresize_single(B_temp, self.opt.reals[i][0] / self.opt.reals[self.opt.scale_num][0], self.opt)
-                B_curr = B_curr[:, :, 0 : self.opt.reals[i][0], 0 : self.opt.reals[i][1]]
-                down_scale_label.append(B_curr)
+                B_curr = B_curr[:, 0 : self.opt.reals[i][0], 0 : self.opt.reals[i][1]]
+                down_scale_image.append(B_curr)
 
         input_dict = {'label': A_tensor, 'image': B_tensor, 'path': A_path, 'down_scale_label': down_scale_label,
                       'down_scale_image': down_scale_image}
