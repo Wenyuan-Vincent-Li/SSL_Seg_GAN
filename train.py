@@ -2,9 +2,10 @@ from options.train_options import TrainOptions
 from Training.train import train
 
 opt = TrainOptions().parse()
-opt.name = 'prostateHD'
-# opt.dataroot = './Datasets/ColonPair_Fine/'
-opt.label_nc = 4
+# opt.name = 'prostateHD'
+opt.name = 'colon'
+opt.dataroot = './Datasets/ColonPair_Fine/'
+opt.label_nc = 6
 Gs = []
 Ss = []
 NoiseAmp = []
