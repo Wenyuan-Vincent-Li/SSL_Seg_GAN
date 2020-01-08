@@ -242,6 +242,7 @@ class DenseNet(nn.Module):
             getattr(self, 'up_dblock' + str(self.n_pool-1)).n_channels_out,
             self.n_classes,
             kernel_size=1)
+        self.softmax = nn.Softmax2d()
 
     def forward(self, x, segment):
         """
@@ -289,32 +290,16 @@ class DenseNet(nn.Module):
                 print('m : ', cat.size(1) + out.size(1))
 
         classif_logit = self.conv1(out)
+        classif_prob = self.softmax(classif_logit)
         _, segment_mask = torch.max(classif_logit, dim = 1, keepdim=True)
         if self.verbose:
             print('Classif: ', classif_logit.size())
-        return classif_logit, segment_mask
-
-# class Ensemble(object):
-#     '''Create an ensemble of models for predictions'''
-#     def __init__(self, models):
-#         '''
-#         models : list. list of model objects with a callable .forward() method.
-#         '''
-#         self.models = models
-#
-#     def __call__(self, inputs):
-#         '''Return the mean prediction of all models in `models`'''
-#         outs = []
-#         for m in self.models:
-#             outs.append(m(inputs))
-#         output = torch.stack(outs)
-#         output = output.sum(0)/len(outs)
-#         return output
+        return classif_logit, classif_prob, segment_mask
 
 
 if __name__ == "__main__":
     image = torch.randn(32, 3, 64, 64)
     segment = torch.randn(32, 4, 64, 64)
     DenseNet = DenseNet(n_channels_in=7)
-    output = DenseNet(image, segment)
-    print(output.shape)
+    o1, o2, o3 = DenseNet(image, segment)
+    print(o1.shape, o2.shape, o3.shape)
