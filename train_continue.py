@@ -4,11 +4,11 @@ from Training import functions
 
 opt = TrainOptions().parse()
 opt.alpha = 0.1
-opt.name = 'prostateHD'
+# opt.name = 'prostateHD'
 
-# opt.name = 'colon'
-# opt.dataroot = './Datasets/ColonPair_Fine/'
-# opt.label_nc = 6
+opt.name = 'colon'
+opt.dataroot = './Datasets/ColonPair_Fine/'
+opt.label_nc = 6
 
 
 opt.scale_factor = 0.10
