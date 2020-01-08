@@ -9,7 +9,7 @@ opt.scale_factor = 0.10
 opt.niter = 2
 opt.noise_amp = 1
 Gs, Ss, reals, NoiseAmp, NoiseAmpS = functions.load_trained_pyramid(opt)
-opt.reals = [[32, 32], [64, 64], [128, 128]]
+opt.reals = [[32, 32], [64, 64], [128, 128], [256, 256], [512, 512]]
 reals = opt.reals
 opt.stop_scale = len(reals)
 train(opt, Gs, Ss, NoiseAmp, NoiseAmpS, reals)
