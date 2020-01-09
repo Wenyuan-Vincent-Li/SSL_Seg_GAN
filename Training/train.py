@@ -40,7 +40,7 @@ def train(opt, Gs, Ss, NoiseAmp, NoiseAmpS, reals):
             # @ scale_num = 0 (nfc_prev = 0 != opt.nfc = 32); for level above 1,
             # we reload the trained weights from the last scale
             G_curr.load_state_dict(torch.load('%s/%d/netG.pth' % (opt.out_, opt.scale_num - 1)))
-            D_curr.load_state_dict(torch.load('%s/%d/netD.pth' % (opt.out_, opt.scale_num - 1)))
+            # D_curr.load_state_dict(torch.load('%s/%d/netD.pth' % (opt.out_, opt.scale_num - 1)))
             S_curr.load_state_dict(torch.load('%s/%d/netS.pth' % (opt.out_, opt.scale_num - 1)))
 
         in_s, in_s_S, G_curr, S_curr = train_single_scale(dataset, D_curr, G_curr, S_curr, opt.reals, Gs, Ss, in_s, in_s_S,
