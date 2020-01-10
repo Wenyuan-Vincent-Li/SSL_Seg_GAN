@@ -46,7 +46,7 @@ class GeneratorConcatSkip2CleanAdd(nn.Module):
         return x + y  # Note that the final output is sum
 
 class WDiscriminator(nn.Module):
-    def __init__(self, input_nc, opt, ndf=64, n_layers=3, norm_layer=nn.BatchNorm2d,
+    def __init__(self, input_nc, opt, ndf=64, n_layers=4, norm_layer=nn.BatchNorm2d,
                  use_sigmoid=False, num_D=2, getIntermFeat=False):
         '''
         :param input_nc: 8

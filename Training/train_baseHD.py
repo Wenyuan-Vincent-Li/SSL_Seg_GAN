@@ -122,7 +122,7 @@ def train_single_scale(dataloader, netD, netG, netS, reals, Gs, Ss, in_s, in_s_S
             loss_D_fake_S = loss.criterionGAN(pred_fake_S, False)
             D_S_z = loss_D_fake_S.item()
 
-            errD = (loss_D_real + 0.8 * loss_D_fake + 0.2 * loss_D_fake_S) * 0.5 ## Todo: figure out a proper coefficient
+            errD = (loss_D_real + loss_D_fake + loss_D_fake_S) * 0.5 ## Todo: figure out a proper coefficient
             errD.backward()
             optimizerD.step()
 
