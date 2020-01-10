@@ -11,7 +11,7 @@ opt.dataroot = './Datasets/ColonPair_Fine/'
 opt.label_nc = 6
 
 
-opt.scale_factor = 0.20
+opt.scale_factor = 0.30
 opt.niter = 200
 opt.noise_amp = 1
 Gs, Ss, reals, NoiseAmp, NoiseAmpS = functions.load_trained_pyramid(opt)
