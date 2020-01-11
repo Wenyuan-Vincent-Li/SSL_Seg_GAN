@@ -6,7 +6,7 @@ from Models.init_models import init_models
 from Training.train_baseHD import train_single_scale
 
 def train(opt, Gs, Ss, NoiseAmp, NoiseAmpS, reals):
-    batchSize = [160,80,40,20,10,5]
+    batchSize = [128,64,32,16,8,4]
     assert len(Gs) == len(Ss), "length of Gs and Ss are not equal!"
     opt.scale_num = len(Gs)
     opt.reals = reals
