@@ -6,10 +6,12 @@ from Models.init_models import init_models
 from Training.train_baseHD import train_single_scale
 
 def train(opt, Gs, Ss, NoiseAmp, NoiseAmpS, reals):
-    batchSize = [64,64,16,4,1]
+    batchSize = [8,8,8,4]
+    iteration = [200, 200, 250, 300]
     assert len(Gs) == len(Ss), "length of Gs and Ss are not equal!"
     opt.scale_num = len(Gs)
     opt.reals = reals
+    opt.niter = iteration[opt.scale_num]
     if opt.scale_num > 0:
         nfc_prev = opt.nfc
         in_s = torch.full([batchSize[opt.scale_num], opt.nc_z, opt.reals[opt.scale_num][0],opt.reals[opt.scale_num][1]], 0, device=opt.device)
