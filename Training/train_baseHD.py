@@ -135,7 +135,7 @@ def train_single_scale(dataloader, netD, netG, netS, reals, Gs, Ss, in_s, in_s_S
             # (2) Update G network: maximize D(G(z))
             ###########################
             netG.zero_grad()
-            pred_fake = netD(fake, data['label'][:,0,...])
+            pred_fake = netD(fake, data['label'][:,0:1,...])
             loss_G_GAN = 0.5 * loss.criterionGAN(pred_fake, True)
 
             # GAN feature matching loss
@@ -176,7 +176,7 @@ def train_single_scale(dataloader, netD, netG, netS, reals, Gs, Ss, in_s, in_s_S
             if opt.contour:
                 loss_G_Seg = loss.crossEntropy(segment_logit, data['label'])
             else:
-                loss_G_Seg = loss.crossEntropy(segment_prob, torch.squeeze(data['label'], dim =1))
+                loss_G_Seg = loss.crossEntropy(segment_prob, torch.squeeze(data['label'][:,0:1,...], dim =1))
 
             # GAN feature matching loss
             loss_G_GAN_Feat_S = 0
@@ -208,7 +208,7 @@ def train_single_scale(dataloader, netD, netG, netS, reals, Gs, Ss, in_s, in_s_S
             plt.imsave('%s/fake_sample_real_%d.png' % (opt.outf, epoch),
                        functions.convert_image_np(data['image']), vmin=0, vmax=1)
             plt.imsave('%s/fake_sample_mask_%d.png' % (opt.outf, epoch),
-                       functions.convert_mask_np(data['label'], num_classes= opt.label_nc))
+                       functions.convert_mask_np(data['label'][:,0:1,...], num_classes= opt.label_nc))
             plt.imsave('%s/segmentation_mask_%d.png' % (opt.outf, epoch),
                        functions.convert_mask_np(segment_mask.detach(), num_classes=opt.label_nc))
 
