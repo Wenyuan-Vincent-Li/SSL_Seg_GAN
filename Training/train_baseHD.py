@@ -174,7 +174,7 @@ def train_single_scale(dataloader, netD, netG, netS, reals, Gs, Ss, in_s, in_s_S
 
             # Segmentation loss
             if opt.contour:
-                loss_G_Seg = loss.crossEntropy(segment_logit.float(), data['label'])
+                loss_G_Seg = loss.crossEntropy(segment_logit, data['label'].float())
             else:
                 loss_G_Seg = loss.crossEntropy(segment_prob, torch.squeeze(data['label'][:,0:1,...], dim =1))
 
