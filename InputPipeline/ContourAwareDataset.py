@@ -6,6 +6,7 @@ import torchvision.transforms as transforms
 import numpy as np
 import torch
 import scipy.ndimage
+from Training.imresize import imresize_single
 
 class ContourAwareDataset(BaseDataset):
     def initialize(self, opt, fixed=False):
@@ -39,6 +40,13 @@ class ContourAwareDataset(BaseDataset):
         A_tensor = transform_A_toTensor(A_temp) * 255.0
         A_tensor = self.create_eroded_mask(torch.squeeze(A_tensor))
 
+        down_scale_label = []
+        for i in range(self.opt.scale_num):
+            down_scale_transform_A = get_downscale_transform(self.opt.reals[i][0], method=Image.NEAREST)
+            A_curr = down_scale_transform_A(A_temp)
+            down_scale_label.append(transform_A_toTensor(A_curr) * 255.0)
+
+
         B_tensor = 0
         ### input B (real images)
         if self.opt.isTrain or self.opt.use_encoded_image:
@@ -46,8 +54,16 @@ class ContourAwareDataset(BaseDataset):
             B = Image.open(B_path).convert('RGB')
             transform_B = get_transform(self.opt, params, fixed=self.fixed)
             B_tensor = transform_B(B)
+            B_temp = B_tensor
 
-        input_dict = {'label': A_tensor, 'image': B_tensor, 'path': A_path}
+            down_scale_image = []
+            for i in range(self.opt.scale_num):
+                B_curr = imresize_single(B_temp, self.opt.reals[i][0] / self.opt.reals[self.opt.scale_num][0], self.opt)
+                B_curr = B_curr[:, 0: self.opt.reals[i][0], 0: self.opt.reals[i][1]]
+                down_scale_image.append(B_curr)
+
+        input_dict = {'label': A_tensor, 'image': B_tensor, 'path': A_path, 'down_scale_label': down_scale_label,
+                      'down_scale_image': down_scale_image}
         return input_dict
 
     def create_eroded_mask(self, label):
