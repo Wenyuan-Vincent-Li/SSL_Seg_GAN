@@ -159,7 +159,7 @@ class DenseNet(nn.Module):
                 n_channels_first=16,
                 n_layers_down=[4,5,7],
                 n_layers_up=[7,5,4],
-                verbose=False):
+                verbose=False, opt = None):
         '''
         DenseNet 103 for semantic segmentation,
         as described in Jegou 2017.
@@ -189,6 +189,7 @@ class DenseNet(nn.Module):
         self.n_layers_down = n_layers_down
         self.n_layers_up = n_layers_up
         self.verbose = verbose
+        self.opt = opt
 
         if len(n_layers_down) != n_pool:
             raise ValueError('`n_layers_down` must be length `n_pool`')
@@ -242,7 +243,10 @@ class DenseNet(nn.Module):
             getattr(self, 'up_dblock' + str(self.n_pool-1)).n_channels_out,
             self.n_classes,
             kernel_size=1)
-        self.softmax = nn.Softmax2d()
+        if self.opt.contour:
+            self.softmax = nn.Sigmoid()
+        else:
+            self.softmax = nn.Softmax2d()
 
     def forward(self, x, segment):
         """
@@ -291,7 +295,11 @@ class DenseNet(nn.Module):
 
         classif_logit = self.conv1(out)
         classif_prob = self.softmax(classif_logit)
-        _, segment_mask = torch.max(classif_logit, dim = 1, keepdim=True)
+        if self.opt.contour:
+            classif_prob = classif_prob[:,0:1,...]
+            segment_mask = (classif_prob > 0.5).float()
+        else:
+            _, segment_mask = torch.max(classif_logit, dim = 1, keepdim=True)
         if self.verbose:
             print('Classif: ', classif_logit.size())
         return classif_logit, classif_prob, segment_mask

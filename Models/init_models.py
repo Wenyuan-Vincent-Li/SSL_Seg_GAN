@@ -18,7 +18,7 @@ def init_models(opt):
         netD.load_state_dict(torch.load(opt.netD))
     print(netD)
 
-    netS = DenseNet(n_classes = opt.label_nc, n_channels_in = opt.input_nc + opt.label_nc).to(opt.device)
+    netS = DenseNet(n_classes = opt.label_nc, n_channels_in = opt.input_nc + opt.label_nc, opt=opt).to(opt.device)
     if opt.netS != '':
         netS.load_state_dict(torch.load(opt.netS))
     print(netS)
