@@ -42,7 +42,10 @@ class CustomDatasetDataLoader(BaseDataLoader):
 
 def CreateDataset(opt, fixed):
     dataset = None
-    from InputPipeline.AlignedDataset import AlignedDataset as Dataset
+    if opt.contour:
+        from InputPipeline.ContourAwareDataset import ContourAwareDataset as Dataset
+    else:
+        from InputPipeline.AlignedDataset import AlignedDataset as Dataset
     dataset = Dataset()
 
     print("dataset [%s] was created" % (dataset.name()))
