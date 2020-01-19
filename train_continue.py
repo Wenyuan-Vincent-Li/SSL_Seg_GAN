@@ -9,6 +9,7 @@ opt.alpha = 0.1
 opt.name = 'colon_BI'
 opt.dataroot = './Datasets/ColonPair_BI/'
 opt.label_nc = 2
+opt.contour = True
 
 
 opt.scale_factor = 0.10
