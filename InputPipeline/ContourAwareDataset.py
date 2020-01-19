@@ -44,7 +44,10 @@ class ContourAwareDataset(BaseDataset):
         for i in range(self.opt.scale_num):
             down_scale_transform_A = get_downscale_transform(self.opt.reals[i][0], method=Image.NEAREST)
             A_curr = down_scale_transform_A(A_temp)
-            down_scale_label.append(transform_A_toTensor(A_curr) * 255.0)
+            if self.opt.contour:
+                down_scale_label.append(((transform_A_toTensor(A_curr) * 255.0) > 0).float())
+            else:
+                down_scale_label.append((transform_A_toTensor(A_curr) * 255.0))
 
 
         B_tensor = 0

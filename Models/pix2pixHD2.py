@@ -38,7 +38,6 @@ class GeneratorConcatSkip2CleanAdd(nn.Module):
         :param mask: mask with the same resolution as x
         :return:
         '''
-        print(torch.max(mask), torch.min(mask))
         mask = mask2onehot(mask, self.opt.label_nc)
         x = torch.cat((x, mask), dim=1)  ## concatenate image and mask
         x = self.model(x)
