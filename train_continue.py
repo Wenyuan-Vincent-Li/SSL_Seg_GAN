@@ -13,7 +13,6 @@ opt.contour = True
 
 
 opt.scale_factor = 0.10
-opt.niter = 200
 opt.noise_amp = 1
 Gs, Ss, reals, NoiseAmp, NoiseAmpS = functions.load_trained_pyramid(opt)
 Gs = Gs[:1]
