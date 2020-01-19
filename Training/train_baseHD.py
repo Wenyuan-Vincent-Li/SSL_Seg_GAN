@@ -255,6 +255,8 @@ def draw_concat(Gs, masks, reals, NoiseAmp, in_s, mode, opt):
             for G, mask, real_curr, real_next, noise_amp in zip(Gs, masks, reals, reals[1:], NoiseAmp):
                 G_z = G_z[:, :, 0:real_curr[0], 0:real_curr[1]]  ## G_z [None, 3, 32, 32]
                 _, G_z, _ = G(mask, G_z)  ## [1, 3, 26, 26] output of previous generator
+                if opt.contour:
+                    G_z = torch.concat((G_z, 1-G_z), 1)
                 G_z = imresize(G_z, real_next[1] / real_curr[1], opt)
                 G_z = G_z[:, :, 0:real_next[0],
                       0:real_next[1]]  ## resize the image to be compatible with current G [1, 3, 33, 33]
