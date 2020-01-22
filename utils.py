@@ -12,6 +12,8 @@ sys.path.append(root_dir)
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import scipy.misc
+import random
+import colorsys
 
 import numpy as np
 
@@ -188,6 +190,44 @@ def merge(images, size):
     else:
         raise ValueError('in merge(images,size) images parameter '
                          'must have dimensions: HxW or HxWx3 or HxWx4')
+
+
+def image_w_instance_overlay(images, masks, colors=None):
+    """
+    masks: [N, 1, height, width]
+    colors: (optional) An array or colors to use with each object
+    """
+    # Number of slides
+    N = images.shape[0]
+    masked_images = []
+    for i in range(N):
+        # Number of instances in the image
+        n = np.max(masks[i])
+        # Generate random colors
+        colors = random_colors(n)
+        mask_image = images[i].astype(np.uint32).copy()
+        for j in range(n):
+            color = colors[j]
+            # Mask
+            mask = np.zeros_like(masks[i, ...])
+            mask[np.where(masks[i, ...] == j)] = 1
+            mask_image = apply_mask(mask_image, mask, color)
+
+        masked_images.append(np.expand_dims(mask_image, axis=0))
+    masked_image = np.concatenate(masked_images, axis=0)
+    return masked_image
+
+def random_colors(N, bright=True):
+    """
+    Generate random colors.
+    To get visually distinct colors, generate them in HSV space then
+    convert to RGB.
+    """
+    brightness = 1.0 if bright else 0.7
+    hsv = [(i / N, 1, brightness) for i in range(N)]
+    colors = list(map(lambda c: colorsys.hsv_to_rgb(*c), hsv))
+    random.shuffle(colors)
+    return colors
 
 
 

@@ -11,7 +11,6 @@ def train(opt, Gs, Ss, NoiseAmp, NoiseAmpS, reals):
     assert len(Gs) == len(Ss), "length of Gs and Ss are not equal!"
     opt.scale_num = len(Gs)
     opt.reals = reals
-    opt.niter = iteration[opt.scale_num]
     if opt.scale_num > 0:
         nfc_prev = opt.nfc
         in_s = torch.full([batchSize[opt.scale_num], opt.nc_z, opt.reals[opt.scale_num][0],opt.reals[opt.scale_num][1]], 0, device=opt.device)
@@ -23,6 +22,7 @@ def train(opt, Gs, Ss, NoiseAmp, NoiseAmpS, reals):
 
     while opt.scale_num < opt.stop_scale:
         opt.batchSize = batchSize[opt.scale_num]
+        opt.niter = iteration[opt.scale_num]
         ## create the dataloader at this scale
         data_loader = CreateDataLoader(opt)
         dataset = data_loader.load_data()
