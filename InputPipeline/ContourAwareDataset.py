@@ -76,7 +76,8 @@ class ContourAwareDataset(BaseDataset):
             if i == 0: continue  # the first label is background
             gland_mask = (label == i).float()
             binarized_mask_border = scipy.ndimage.morphology.binary_erosion(gland_mask,
-                                                                            structure=np.ones((4, 4)),
+                                                                            structure=np.ones((self.opt.erod[self.opt.scale_num],
+                                                                                               self.opt.erod[self.opt.scale_num])),
                                                                             border_value=1)
 
             binarized_mask_border = torch.from_numpy(binarized_mask_border.astype(np.float32))
