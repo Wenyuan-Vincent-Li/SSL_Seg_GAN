@@ -37,12 +37,12 @@ def Segmentation(Ss, reals, images, NoiseAmp, opt, in_s=None, scale_v=1, scale_h
                 I_prev = I_prev[:, :, 0:round(scale_v * reals[n][0]), 0:round(scale_h * reals[n][1])]
                 I_prev = functions.upsampling(I_prev, nzx, nzy)
 
-            _, I_curr, _ = S(image, I_prev)
+            Seg_logits, I_curr, _ = S(image, I_prev)
 
             masks.append(I_curr)
             I_prev = I_curr
             n += 1
-    return masks, masks[-1]
+    return masks, masks[-1], torch.sigmoid(Seg_logits)
 
 class Inference(object):
     def __init__(self, data_loader, opt):
@@ -73,7 +73,7 @@ class Inference(object):
                 break
             val_data["down_scale_image"] += [val_data["image"]]
             labels = val_data["label"][:,0:1,...].to(self.device)
-            _, outputs = Segmentation(Ss, self.opt.reals, val_data["down_scale_image"], NoiseAmp, self.opt)
+            _, outputs, seg_prob = Segmentation(Ss, self.opt.reals, val_data["down_scale_image"], NoiseAmp, self.opt)
             if self.opt.label_nc > 2:
                 labels = torch.squeeze(labels, dim=1).long()
             loss = self.criterion(outputs, labels)
@@ -92,7 +92,7 @@ class Inference(object):
                 mIOU.update_matrix(labels.view(-1).int().cpu().numpy(),
                                    preds.view(-1).cpu().numpy())
 
-            predictions.append(outputs.cpu().numpy())
+            predictions.append(seg_prob.cpu().numpy())
             images.append(val_data["image"].cpu().numpy())
             gts.append(labels.cpu().numpy())
 
