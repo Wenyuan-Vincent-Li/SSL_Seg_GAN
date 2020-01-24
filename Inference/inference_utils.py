@@ -52,7 +52,7 @@ def crop_result(result, image):
 
 def split_objects(image):
     """Helper function to threshold image and thereby split close glands"""
-    return (image[0] > 0.55)
+    return (image[0] > 0.7)
 
 def remove_small_object(labeled_image, threshold=500):
     """Helper function to remove small objects"""
