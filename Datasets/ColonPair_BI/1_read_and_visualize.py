@@ -43,3 +43,4 @@ with open(os.path.join(image_folder, "Grade.csv"), newline='') as csvfile:
                     crop_label_fine = Image.fromarray(crop_label_fine)
                     crop_label_fine.save("train_label_fine/" + name + "_sementic.png")
                     train_id += 1
+

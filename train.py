@@ -3,7 +3,7 @@ from Training.train import train
 
 opt = TrainOptions().parse()
 # opt.name = 'prostateHD'
-opt.name = 'colon_BI'
+opt.name = 'colon_BI_80'
 opt.dataroot = './Datasets/ColonPair_BI/'
 opt.label_nc = 2
 opt.contour = True
@@ -19,5 +19,6 @@ opt.alpha = 0.1
 opt.scale_factor = 0.20
 opt.noise_amp = 1
 opt.stop_scale = len(opt.reals)
+opt.phase = "train_80"
 
 train(opt, Gs, Ss, NoiseAmp, NoiseAmpS, opt.reals)
