@@ -7,7 +7,7 @@ from Training.train_baseHD import train_single_scale
 
 def train(opt, Gs, Ss, NoiseAmp, NoiseAmpS, reals):
     batchSize = [8,8,4,3]
-    iteration = [5, 5, 5, 5]
+    iteration = [250, 250, 250, 250]
     assert len(Gs) == len(Ss), "length of Gs and Ss are not equal!"
     opt.scale_num = len(Gs)
     opt.reals = reals
