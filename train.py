@@ -3,10 +3,10 @@ from Training.train import train
 
 opt = TrainOptions().parse()
 # opt.name = 'prostateHD'
-opt.name = 'colon_BI_20'
-opt.dataroot = './Datasets/ColonPair_BI/'
-opt.label_nc = 2
-opt.contour = True
+opt.name = 'colon_Fine_100'
+opt.dataroot = './Datasets/ColonPair_Fine/'
+opt.label_nc = 6
+opt.contour = False
 Gs = []
 Ss = []
 NoiseAmp = []
@@ -16,9 +16,9 @@ NoiseAmpS = []
 opt.reals = [[64,64],[128,128],[256,256],[512,512]]
 opt.erod = [1, 3, 6, 13]
 opt.alpha = 0.1
-opt.scale_factor = 0.30
+opt.scale_factor = 1.10
 opt.noise_amp = 1
 opt.stop_scale = len(opt.reals)
-opt.phase = "train_20"
+opt.phase = "train"
 
 train(opt, Gs, Ss, NoiseAmp, NoiseAmpS, opt.reals)
