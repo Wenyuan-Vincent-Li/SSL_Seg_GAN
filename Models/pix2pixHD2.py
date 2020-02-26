@@ -101,7 +101,7 @@ class WDiscriminator(nn.Module):
         return result
 
 class NLayerDiscriminator(nn.Module):
-    def __init__(self, input_nc, opt, ndf=64, n_layers=4, norm_layer=nn.BatchNorm2d, use_sigmoid=False, getIntermFeat=False):
+    def __init__(self, input_nc, opt, ndf=64, n_layers=3, norm_layer=nn.BatchNorm2d, use_sigmoid=False, getIntermFeat=False):
         super(NLayerDiscriminator, self).__init__()
         self.getIntermFeat = getIntermFeat
         self.n_layers = n_layers
